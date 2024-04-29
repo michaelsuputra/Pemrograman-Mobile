@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:my_app/signup_page.dart';
 import 'home_page.dart';
 
@@ -16,6 +18,10 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController passwordController = TextEditingController();
   bool rememberUser = false;
 
+  final dio = Dio();
+  final myStorage = GetStorage();
+  final apiUrl = 'https://mobileapis.manpits.xyz/api';
+
   @override
   Widget build(BuildContext context) {
     myColor = Theme.of(context).primaryColor;
@@ -25,10 +31,10 @@ class _LoginPageState extends State<LoginPage> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/images/bg.png"),
+            image: const AssetImage("assets/images/bg.png"),
             fit: BoxFit.cover,
             colorFilter:
-                ColorFilter.mode(myColor.withOpacity(0.2), BlendMode.dstATop),
+                ColorFilter.mode(myColor.withOpacity(0.5), BlendMode.dstATop),
           ),
         ),
         child: Center(
@@ -42,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
                   size: 100,
                   color: Colors.white,
                 ),
-                Text(
+                const Text(
                   "HALLO MIKE",
                   style: TextStyle(
                     color: Colors.white,
@@ -65,7 +71,8 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SignUpPage()),
+                      MaterialPageRoute(
+                          builder: (context) => const SignUpPage()),
                     );
                   },
                   child: _buildGreyText("Sign Up"),
@@ -87,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: const TextStyle(color: Colors.white),
-        enabledBorder: UnderlineInputBorder(
+        enabledBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.white),
         ),
       ),
@@ -133,29 +140,14 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildLoginButton() {
     return ElevatedButton(
       onPressed: () {
-        String enteredEmail = emailController.text;
-        String enteredPassword = passwordController.text;
-        if (enteredEmail == 'user@gmail.com' && enteredPassword == 'password') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => HomePage()),
-          );
-        } else {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Login Failed'),
-              content:
-                  const Text('Invalid email or password. Please try again.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-          );
-        }
+        goLogin(
+          context,
+          emailController,
+          passwordController,
+          dio,
+          myStorage,
+          apiUrl,
+        );
       },
       style: ElevatedButton.styleFrom(
         shape: const StadiumBorder(),
@@ -184,5 +176,24 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
     );
+  }
+}
+
+void goLogin(BuildContext context, emailController, passwordController, dio,
+    myStorage, apiUrl) async {
+  try {
+    final response = await dio.post('$apiUrl/login', data: {
+      'email': emailController.text,
+      'password': passwordController.text,
+    });
+    print(response.data);
+    myStorage.write('token', response.data['data']['token']);
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(),
+        ));
+  } on DioException catch (e) {
+    print('Error : ${e.response?.statusCode} - ${e.response?.data}');
   }
 }

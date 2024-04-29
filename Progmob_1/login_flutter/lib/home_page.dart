@@ -1,7 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  HomePage({Key? key}) : super(key: key);
+
+  final dio = Dio();
+  final myStorage = GetStorage();
+  final apiUrl = 'https://mobileapis.manpits.xyz/api';
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +29,6 @@ class HomePage extends StatelessWidget {
           children: <Widget>[
             const CircleAvatar(
               radius: 60,
-              backgroundImage: AssetImage('assets/images/avatar.jpg'),
             ),
             const SizedBox(height: 20),
             const Text(
@@ -37,7 +42,9 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 40),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                goUser(dio, apiUrl, myStorage);
+              },
               child: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Text(
@@ -50,5 +57,19 @@ class HomePage extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+void goUser(dio, apiUrl, myStorage) async {
+  try {
+    final response = await dio.get(
+      '$apiUrl/user',
+      options: Options(
+        headers: {'Authorization': 'Bearer ${myStorage.read('token')}'},
+      ),
+    );
+    print(response.data);
+  } on DioException catch (e) {
+    print('Error : ${e.response?.statusCode} - ${e.response?.data}');
   }
 }

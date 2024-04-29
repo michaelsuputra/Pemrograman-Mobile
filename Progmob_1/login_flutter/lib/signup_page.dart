@@ -1,6 +1,8 @@
 // ignore_for_file: unused_import
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'login_page.dart';
 import 'home_page.dart';
 
@@ -14,9 +16,14 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   late Color myColor;
   late Size mediaSize;
+
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  final dio = Dio();
+  final myStorage = GetStorage();
+  final apiUrl = 'https://mobileapis.manpits.xyz/api';
 
   @override
   Widget build(BuildContext context) {
@@ -27,10 +34,10 @@ class _SignUpPageState extends State<SignUpPage> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/images/bg.png"),
+            image: const AssetImage("assets/images/bg.png"),
             fit: BoxFit.cover,
             colorFilter:
-                ColorFilter.mode(myColor.withOpacity(0.2), BlendMode.dstATop),
+                ColorFilter.mode(myColor.withOpacity(0.5), BlendMode.dstATop),
           ),
         ),
         child: Center(
@@ -39,7 +46,7 @@ class _SignUpPageState extends State<SignUpPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                const Text(
                   "Sign Up",
                   style: TextStyle(
                     color: Colors.white,
@@ -47,23 +54,23 @@ class _SignUpPageState extends State<SignUpPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 _buildInputField(nameController, "Name"),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 _buildInputField(emailController, "Email address"),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 _buildInputField(passwordController, "Password",
                     isPassword: true),
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 _buildSignUpButton(),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 TextButton(
                   onPressed: () {
                     Navigator.pushReplacementNamed(context, '/login');
                   },
                   child: _buildGreyText("Back to Login"),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 _buildOtherSignUp(),
               ],
             ),
@@ -79,12 +86,12 @@ class _SignUpPageState extends State<SignUpPage> {
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: TextStyle(color: Colors.white),
-        enabledBorder: UnderlineInputBorder(
+        labelStyle: const TextStyle(color: Colors.white),
+        enabledBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.white),
         ),
       ),
-      style: TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.white),
       obscureText: isPassword,
     );
   }
@@ -92,37 +99,24 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget _buildGreyText(String text) {
     return Text(
       text,
-      style: TextStyle(color: Colors.grey),
+      style: const TextStyle(color: Colors.grey),
     );
   }
 
   Widget _buildSignUpButton() {
     return ElevatedButton(
       onPressed: () {
-        String name = nameController.text;
-        String email = emailController.text;
-        String password = passwordController.text;
-
-        if (name.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
-          // Data user berhasil didaftarkan, navigasi ke halaman home
-          Navigator.pushReplacementNamed(context, '/home');
-        } else {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text('Sign Up Failed'),
-              content: Text('Please fill in all the fields.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text('OK'),
-                ),
-              ],
-            ),
-          );
-        }
+        goRegister(
+          context,
+          dio,
+          myStorage,
+          apiUrl,
+          nameController,
+          emailController,
+          passwordController,
+        );
       },
-      child: Text("SIGN UP"),
+      child: const Text("SIGN UP"),
     );
   }
 
@@ -131,7 +125,7 @@ class _SignUpPageState extends State<SignUpPage> {
       child: Column(
         children: [
           _buildGreyText("Or Sign Up with"),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -143,5 +137,19 @@ class _SignUpPageState extends State<SignUpPage> {
         ],
       ),
     );
+  }
+}
+
+void goRegister(BuildContext context, dio, myStorage, apiUrl, nameController,
+    emailController, passwordController) async {
+  try {
+    final response = await dio.post('$apiUrl/register', data: {
+      'name': nameController.text,
+      'email': emailController.text,
+      'password': passwordController.text,
+    });
+    print(response.data);
+  } on DioException catch (e) {
+    print('${e.response} - ${e.response?.statusCode}');
   }
 }
