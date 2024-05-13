@@ -106,6 +106,7 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget _buildSignUpButton() {
     return ElevatedButton(
       onPressed: () {
+        // memanggil fungsi register
         goRegister(
           context,
           dio,
@@ -140,6 +141,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 }
 
+// fungsi register
 void goRegister(BuildContext context, dio, myStorage, apiUrl, nameController,
     emailController, passwordController) async {
   try {

@@ -1,6 +1,11 @@
+import 'dart:js';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:my_app/add_user.dart';
+import 'package:my_app/list_user.dart';
+import 'package:my_app/login_page.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({Key? key}) : super(key: key);
@@ -16,7 +21,7 @@ class HomePage extends StatelessWidget {
         title: const Text('Home Page'),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
             onPressed: () {
               Navigator.pushReplacementNamed(context, '/login');
             },
@@ -42,6 +47,7 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 40),
             ElevatedButton(
+              // tombol login
               onPressed: () {
                 goUser(dio, apiUrl, myStorage);
               },
@@ -53,6 +59,60 @@ class HomePage extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              // tombol list user
+              onPressed: () {
+                // Balik ke halaman login
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ListUser(),
+                  ),
+                );
+              },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Text(
+                  'List User',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              // tombol list user
+              onPressed: () {
+                // Balik ke halaman login
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddUser(),
+                  ),
+                );
+              },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Text(
+                  'Tambah User',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              // tombol logout
+              onPressed: () {
+                goLogout(context, dio, apiUrl, myStorage);
+              },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Text(
+                  'Logout',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -60,6 +120,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
+// Fungsi login
 void goUser(dio, apiUrl, myStorage) async {
   try {
     final response = await dio.get(
@@ -69,6 +130,29 @@ void goUser(dio, apiUrl, myStorage) async {
       ),
     );
     print(response.data);
+  } on DioException catch (e) {
+    print('Error : ${e.response?.statusCode} - ${e.response?.data}');
+  }
+}
+
+// Fungsi logout
+void goLogout(context, dio, apiUrl, myStorage) async {
+  try {
+    final response = await dio.get(
+      '$apiUrl/logout',
+      options: Options(
+        headers: {'Authorization': 'Bearer ${myStorage.read('token')}'},
+      ),
+    );
+    print(response.data);
+
+    // Balik ke halaman login
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const LoginPage(),
+      ),
+    );
   } on DioException catch (e) {
     print('Error : ${e.response?.statusCode} - ${e.response?.data}');
   }

@@ -23,6 +23,26 @@ class _LoginPageState extends State<LoginPage> {
   final apiUrl = 'https://mobileapis.manpits.xyz/api';
 
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      checkLoginStatus();
+    });
+  }
+
+  void checkLoginStatus() {
+    final token = myStorage.read('token');
+    if (token != null) {
+      // Jika pengguna sudah login, arahkan ke halaman login page
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     myColor = Theme.of(context).primaryColor;
     mediaSize = MediaQuery.of(context).size;
