@@ -1,16 +1,17 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:my_app/edit_user.dart';
+import 'package:my_app/add_transaksi.dart';
+import 'package:my_app/saldo_user.dart';
 
-class ListUser extends StatefulWidget {
-  ListUser({super.key});
+class ListTransaksi extends StatefulWidget {
+  const ListTransaksi({super.key});
 
   @override
-  State<ListUser> createState() => _ListUserState();
+  State<ListTransaksi> createState() => _ListTransaksiState();
 }
 
-class _ListUserState extends State<ListUser> {
+class _ListTransaksiState extends State<ListTransaksi> {
   final dio = Dio();
   final myStorage = GetStorage();
   final apiUrl = 'https://mobileapis.manpits.xyz/api';
@@ -19,10 +20,10 @@ class _ListUserState extends State<ListUser> {
   @override
   void initState() {
     super.initState();
-    getUser();
+    getAnggota();
   }
 
-  void getUser() async {
+  void getAnggota() async {
     try {
       final response = await dio.get(
         '$apiUrl/anggota',
@@ -40,27 +41,21 @@ class _ListUserState extends State<ListUser> {
     }
   }
 
-  void deleteUser(int id) async {
-    try {
-      final response = await dio.delete(
-        '$apiUrl/anggota/$id',
-        options: Options(
-          headers: {'Authorization': 'Bearer ${myStorage.read('token')}'},
-        ),
-      );
-
-      print(response.data);
-
-      getUser();
-    } on DioException catch (e) {
-      print('${e.response} - ${e.response?.statusCode}');
-    }
-  }
-
-  void editUser(Map<String, dynamic> user) {
+  void tambahTransaksi(Map<String, dynamic> user) async {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => EditUser(user: user)),
+      MaterialPageRoute(
+        builder: (context) => AddTransaksi(user: user),
+      ),
+    );
+  }
+
+  void goSaldo(Map<String, dynamic> user) async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SaldoUser(user: user),
+      ),
     );
   }
 
@@ -68,7 +63,7 @@ class _ListUserState extends State<ListUser> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('List User'),
+        title: const Text('List Transaksi Anggota'),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -87,18 +82,18 @@ class _ListUserState extends State<ListUser> {
                         children: [
                           IconButton(
                             onPressed: () {
-                              editUser(user);
+                              tambahTransaksi(user);
                             },
-                            icon: Icon(
-                              Icons.edit,
+                            icon: const Icon(
+                              Icons.add,
                             ),
                           ),
                           IconButton(
                             onPressed: () {
-                              deleteUser(user['id']);
+                              goSaldo(user);
                             },
-                            icon: Icon(
-                              Icons.delete,
+                            icon: const Icon(
+                              Icons.money,
                             ),
                           )
                         ],

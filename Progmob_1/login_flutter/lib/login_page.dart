@@ -157,6 +157,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+//memanggil fungsi login
   Widget _buildLoginButton() {
     return ElevatedButton(
       onPressed: () {
@@ -199,6 +200,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
+//fungsi login
 void goLogin(BuildContext context, emailController, passwordController, dio,
     myStorage, apiUrl) async {
   try {

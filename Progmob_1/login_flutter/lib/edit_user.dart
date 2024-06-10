@@ -1,25 +1,72 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:my_app/home_page.dart';
+import 'package:my_app/list_user.dart';
+// import 'package:page_transition/page_transition.dart';
 
-class AddUser extends StatefulWidget {
-  const AddUser({super.key});
+class EditUser extends StatefulWidget {
+  final Map<String, dynamic> user;
+
+  const EditUser({
+    super.key,
+    required this.user,
+  });
 
   @override
-  State<AddUser> createState() => _AddUserState();
+  State<EditUser> createState() => _EditUserState();
 }
 
-class _AddUserState extends State<AddUser> {
+class _EditUserState extends State<EditUser> {
   final dio = Dio();
   final myStorage = GetStorage();
   final apiUrl = 'https://mobileapis.manpits.xyz/api';
 
-  TextEditingController noIndukController = TextEditingController();
-  TextEditingController namaController = TextEditingController();
-  TextEditingController alamatController = TextEditingController();
-  TextEditingController tglLahirController = TextEditingController();
-  TextEditingController teleponController = TextEditingController();
+  late TextEditingController noIndukController;
+  late TextEditingController namaController;
+  late TextEditingController alamatController;
+  late TextEditingController tglLahirController;
+  late TextEditingController teleponController;
+
+  @override
+  void initState() {
+    super.initState();
+    noIndukController =
+        TextEditingController(text: widget.user['nomor_induk'].toString());
+    namaController = TextEditingController(text: widget.user['nama']);
+    alamatController = TextEditingController(text: widget.user['alamat']);
+    tglLahirController = TextEditingController(text: widget.user['tgl_lahir']);
+    teleponController = TextEditingController(text: widget.user['telepon']);
+  }
+
+  void updateUser() async {
+    try {
+      final response = await dio.put(
+        '$apiUrl/anggota/${widget.user['id']}',
+        options: Options(
+          headers: {'Authorization': 'Bearer ${myStorage.read('token')}'},
+        ),
+        data: {
+          'nomor_induk': noIndukController.text,
+          'nama': namaController.text,
+          'alamat': alamatController.text,
+          'tgl_lahir': tglLahirController.text,
+          'telepon': teleponController.text,
+        },
+      );
+
+      print(response.data);
+
+      // Pindah halaman ke home jika berhasil register
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ListUser(),
+        ),
+      );
+    } on DioException catch (e) {
+      print('${e.response} - ${e.response?.statusCode}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +76,7 @@ class _AddUserState extends State<AddUser> {
         child: Column(
           children: [
             const Text(
-              'Tambahkan Data Anggota',
+              'Edit Data Anggota',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(
@@ -137,16 +184,7 @@ class _AddUserState extends State<AddUser> {
             ),
             ElevatedButton(
                 onPressed: () {
-                  addUser(
-                      context,
-                      dio,
-                      myStorage,
-                      apiUrl,
-                      noIndukController,
-                      namaController,
-                      alamatController,
-                      tglLahirController,
-                      teleponController);
+                  updateUser();
                 },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
@@ -167,41 +205,5 @@ class _AddUserState extends State<AddUser> {
         ),
       ),
     );
-  }
-}
-
-void addUser(
-    BuildContext context,
-    dio,
-    myStorage,
-    apiUrl,
-    noIndukController,
-    namaController,
-    alamatController,
-    tglLahirController,
-    teleponController) async {
-  try {
-    final response = await dio.post(
-      '$apiUrl/anggota',
-      options: Options(
-        headers: {'Authorization': 'Bearer ${myStorage.read('token')}'},
-      ),
-      data: {
-        'nomor_induk': noIndukController.text,
-        'nama': namaController.text,
-        'alamat': alamatController.text,
-        'tgl_lahir': tglLahirController.text,
-        'telepon': teleponController.text,
-      },
-    );
-    print(response.data);
-
-    // Pindah halaman ke home jika berhasil register
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => HomePage()),
-    );
-  } on DioException catch (e) {
-    print('${e.response} - ${e.response?.statusCode}');
   }
 }

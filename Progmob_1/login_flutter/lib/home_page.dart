@@ -1,9 +1,8 @@
-import 'dart:js';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:my_app/add_user.dart';
+import 'package:my_app/list_transaksi.dart';
 import 'package:my_app/list_user.dart';
 import 'package:my_app/login_page.dart';
 
@@ -29,91 +28,129 @@ class HomePage extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const CircleAvatar(
-              radius: 60,
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Welcome back, Mike!',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'How are you?',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              // tombol login
-              onPressed: () {
-                goUser(dio, apiUrl, myStorage);
-              },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: Text(
-                  'View Profile',
-                  style: TextStyle(fontSize: 18),
-                ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const CircleAvatar(
+                radius: 60,
               ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              // tombol list user
-              onPressed: () {
-                // Balik ke halaman login
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ListUser(),
+              const SizedBox(height: 20),
+              const Text(
+                'Welcome back, Mike!',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'How are you?',
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 40),
+              Container(
+                width: double.infinity,
+                child: ElevatedButton(
+                  // tombol login
+                  onPressed: () {
+                    goUser(dio, apiUrl, myStorage);
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    child: Text(
+                      'View Profile',
+                      style: TextStyle(fontSize: 18),
+                    ),
                   ),
-                );
-              },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: Text(
-                  'List User',
-                  style: TextStyle(fontSize: 18),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              // tombol list user
-              onPressed: () {
-                // Balik ke halaman login
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddUser(),
+              const SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                child: ElevatedButton(
+                  // tombol list user
+                  onPressed: () {
+                    // Balik ke halaman login
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ListUser(),
+                      ),
+                    );
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    child: Text(
+                      'List User',
+                      style: TextStyle(fontSize: 18),
+                    ),
                   ),
-                );
-              },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: Text(
-                  'Tambah User',
-                  style: TextStyle(fontSize: 18),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              // tombol logout
-              onPressed: () {
-                goLogout(context, dio, apiUrl, myStorage);
-              },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: Text(
-                  'Logout',
-                  style: TextStyle(fontSize: 18),
+              const SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                child: ElevatedButton(
+                  // tombol list user
+                  onPressed: () {
+                    // Balik ke halaman login
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddUser(),
+                      ),
+                    );
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    child: Text(
+                      'Tambah User',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                child: ElevatedButton(
+                  // tombol list user
+                  onPressed: () {
+                    // Balik ke halaman login
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ListTransaksi(),
+                      ),
+                    );
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    child: Text(
+                      'Transaksi Anggota',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                child: ElevatedButton(
+                  // tombol logout
+                  onPressed: () {
+                    goLogout(context, dio, apiUrl, myStorage);
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    child: Text(
+                      'Logout',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
